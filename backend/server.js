@@ -50,17 +50,19 @@ app.use(express.json({limit: '150mb'}));
 app.use(express.urlencoded({ limit: '150mb', extended: true }));
 app.use(cookieParser());
 
+app.set('trust proxy', 1);
+
 app.use(session({
   secret: process.env.SESSION_SECRET || '5up3r_v1t3c',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false,
+    secure: true,        // obligatorio en producción con HTTPS
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: 'none',    // permite enviar cookie entre dominios
     maxAge: 24 * 60 * 60 * 1000
   },
-}));  
+})); 
 
 app.use(attachUser);
 
