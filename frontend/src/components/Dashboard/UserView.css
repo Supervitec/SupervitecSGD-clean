@@ -1,0 +1,198 @@
+/* ==================== VARIABLES (hereda de Dashboard) ==================== */
+:root {
+  --user-primary: #3b82f6;
+  --user-bg: #0a0f1e;
+  --user-card-bg: #111827;
+  --user-input-bg: #1f2937;
+  --user-border: #374151;
+  --user-text: #e5e7eb;
+  --user-text-soft: #9ca3af;
+}
+
+/* ==================== CONTENEDOR PRINCIPAL ==================== */
+.user-view {
+  padding: 0;
+  max-width: 100%;
+  margin: 0;
+  width: 100%;
+  background: var(--user-bg);
+  min-height: calc(100vh - 80px);
+}
+
+/* ==================== HEADER DE USUARIO ==================== */
+.user-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--user-card-bg) 0%, #0f1623 100%);
+  border-bottom: 2px solid var(--user-border);
+  position: relative;
+}
+
+.user-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--user-primary), #60a5fa);
+}
+
+.user-header h1 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: #f9fafb;
+  background: linear-gradient(135deg, #f9fafb 0%, var(--user-primary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.user-header p {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  margin: 0;
+  color: var(--user-text-soft);
+}
+
+/* ==================== TABS DE NAVEGACIÓN ==================== */
+.user-tabs {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 0 2rem 2rem 2rem;
+  padding: 0.5rem;
+  background: var(--user-card-bg);
+  border-radius: 0.75rem;
+  border: 1px solid var(--user-border);
+  flex-wrap: wrap;
+}
+
+.user-tabs button {
+  padding: 0.875rem 2rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--user-text-soft);
+  font-weight: 600;
+  position: relative;
+}
+
+.user-tabs button::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: var(--user-primary);
+  border-radius: 0 3px 3px 0;
+  transition: all 0.2s ease;
+}
+
+.user-tabs button:hover {
+  background: var(--user-input-bg);
+  color: var(--user-text);
+  border-color: var(--user-border);
+}
+
+.user-tabs button:hover::before {
+  height: 60%;
+}
+
+.user-tabs button.active {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(96, 165, 250, 0.1));
+  color: var(--user-primary);
+  border-color: var(--user-primary);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+.user-tabs button.active::before {
+  height: 80%;
+}
+
+/* ==================== CONTENIDO ==================== */
+.user-content {
+  background: transparent;
+  border-radius: 0;
+  padding: 0 2rem 2rem 2rem;
+  box-shadow: none;
+  min-height: 400px;
+}
+
+/* ==================== EMPTY STATE ==================== */
+.user-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background: var(--user-card-bg);
+  border: 2px dashed var(--user-border);
+  border-radius: 0.75rem;
+  text-align: center;
+  gap: 1rem;
+}
+
+.user-empty-state p {
+  font-size: 1rem;
+  color: var(--user-text-soft);
+  margin: 0;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .user-view {
+    padding: 0;
+  }
+
+  .user-header {
+    padding: 1.5rem 1rem;
+  }
+
+  .user-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .user-header p {
+    font-size: 0.875rem;
+  }
+
+  .user-tabs {
+    flex-direction: column;
+    margin: 0 1rem 1.5rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .user-tabs button {
+    width: 100%;
+    text-align: left;
+    padding-left: 1.5rem;
+  }
+
+  .user-tabs button.active {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.15));
+  }
+
+  .user-content {
+    padding: 0 1rem 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .user-tabs button {
+    font-size: 0.875rem;
+    padding: 0.75rem 1.25rem;
+  }
+}

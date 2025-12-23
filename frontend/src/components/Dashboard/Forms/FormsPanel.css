@@ -1,0 +1,208 @@
+/* ==================== PANEL DE FORMULARIOS ==================== */
+.forms-panel {
+  width: 100%;
+  padding: 0;
+  background: transparent;
+}
+
+/* ==================== HEADER ==================== */
+.forms-header {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid #666666;
+}
+
+.forms-header h2 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #fbf9f9;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.forms-header h2 span.icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 0 0, rgba(253, 253, 253, 0.6), transparent 60%);
+  box-shadow: 0 0 20px rgb(88, 171, 255);
+  font-size: 1.3rem;
+}
+
+.forms-header p {
+  font-size: 0.95rem;
+  color: #af9c9c;
+  margin: 0;
+}
+
+/* línea decorativa */
+.forms-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 140px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #c5c5c5, #b9b9b9, #4f4f4f);
+  background-size: 200% 100%;
+  animation: header-bar 5s linear infinite;
+  box-shadow: 0 0 25px rgba(246, 59, 59, 0.45);
+}
+
+@keyframes header-bar {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Badge contextual */
+.forms-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.8rem;
+  margin-top: 0.75rem;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.95);
+  border: 1px solid rgba(59,130,246,0.7);
+  color: #bfdbfe;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ==================== TABS ==================== */
+.forms-tabs {
+  display: inline-flex;
+  gap: 0.5rem;
+  margin: 0.5rem 1 1rem;
+  padding: 0.01rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at 0 0, rgba(15,23,42,0.95), rgba(2,6,23,0.95));
+  border: 1px solid #2e2e2e;
+}
+
+.tab-btn {
+  padding: 0.6rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  position: relative;
+  white-space: nowrap;
+}
+
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at top, rgba(59,130,246,0.2), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.tab-btn:hover {
+  color: #ebe5e5;
+}
+
+.tab-btn:hover::after {
+  opacity: 1;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #666666, #001537);
+  color: #3d3d3d;
+  box-shadow: 0 6px 18px rgba(57, 57, 57, 0.55);
+  transform: translateY(-1px);
+}
+
+/* ==================== CONTENIDO ==================== */
+.forms-content {
+  min-height: 400px;
+}
+
+/* ==================== LOADING ==================== */
+.forms-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1.5rem;
+}
+
+.forms-loading p {
+  color: #9ca3af;
+  font-size: 0.95rem;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #1f2937;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==================== ESTADO VACÍO ==================== */
+.forms-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #9ca3af;
+}
+
+.forms-empty-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  opacity: 0.18;
+}
+
+.forms-empty p {
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+}
+
+.forms-empty small {
+  color: #6b7280;
+}
+
+/* ==================== ID BADGE ==================== */
+.form-id-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: #222222;
+  border: 1px solid #dbdbdb;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  color: #969695;
+  font-family: 'Courier New', monospace;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .forms-tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    flex: 1;
+  }
+}

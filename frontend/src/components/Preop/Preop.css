@@ -1,0 +1,459 @@
+/* ==================== VARIABLES GLOBALES ==================== */
+:root {
+  --preop-bg: #0a0f1e;
+  --preop-card-bg: #111827;
+  --preop-input-bg: #1f2937;
+  --preop-border: #374151;
+  --preop-text: #e5e7eb;
+  --preop-text-soft: #9ca3af;
+  --preop-primary: #3b82f6;
+  --preop-success: #22c55e;
+  --preop-error: #ef4444;
+}
+
+/* ==================== CONTENEDOR PRINCIPAL ==================== */
+.preop-container {
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: var(--preop-bg);
+  min-height: 100vh;
+  color: var(--preop-text);
+}
+
+/* ==================== HEADER ==================== */
+.preop-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--preop-border);
+  position: relative;
+}
+
+.preop-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--preop-primary), #60a5fa);
+}
+
+.preop-header h1,
+.preop-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #f9fafb;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #f9fafb 0%, var(--preop-primary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.preop-header h3 {
+  font-size: 1rem;
+  color: var(--preop-text-soft);
+  font-weight: 500;
+  margin: 0.5rem 0 0 0;
+}
+
+.preop-header p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--preop-text-soft);
+}
+
+/* ==================== SELECTOR DE VEHÍCULO ==================== */
+.vehicle-selector {
+  margin-bottom: 2.5rem;
+}
+
+.vehicle-selector h3 {
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--preop-text);
+  margin-bottom: 1.5rem;
+}
+
+.vehicle-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.vehicle-btn {
+  padding: 1.25rem 2rem;
+  background: linear-gradient(135deg, var(--preop-card-bg) 0%, #0f1623 100%);
+  border: 2px solid var(--preop-border);
+  border-radius: 0.75rem;
+  color: var(--preop-text-soft);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+  position: relative;
+  overflow: hidden;
+}
+
+.vehicle-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--preop-primary), #60a5fa);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.vehicle-btn:hover {
+  border-color: var(--preop-primary);
+  color: var(--preop-text);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.25);
+}
+
+.vehicle-btn:hover::before {
+  opacity: 1;
+}
+
+.vehicle-btn.active {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(96, 165, 250, 0.1));
+  border-color: var(--preop-primary);
+  color: var(--preop-primary);
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+}
+
+.vehicle-btn.active::before {
+  opacity: 1;
+}
+
+/* ==================== FORM CONTAINER ==================== */
+.preop-form-container {
+  background: var(--preop-card-bg);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  border: 1px solid var(--preop-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--preop-border);
+}
+
+.form-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f9fafb;
+  margin: 0;
+}
+
+.change-vehicle-btn {
+  padding: 0.6rem 1.15rem;
+  background: var(--preop-input-bg);
+  border: 1px solid var(--preop-border);
+  border-radius: 0.5rem;
+  color: var(--preop-text-soft);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.change-vehicle-btn:hover {
+  background: var(--preop-border);
+  color: var(--preop-text);
+  border-color: var(--preop-primary);
+}
+
+/* ==================== INFO DEL CONDUCTOR ==================== */
+.form-info {
+  background: var(--preop-input-bg);
+  border: 1px solid var(--preop-border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.form-info p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--preop-text-soft);
+}
+
+.form-info strong {
+  color: var(--preop-text);
+  font-weight: 600;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+/* ==================== FORM Y FIELDS ==================== */
+.preop-form {
+  display: block;
+  width: 100%;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--preop-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-field label::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: var(--preop-primary);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--preop-input-bg);
+  border: 2px solid var(--preop-border);
+  border-radius: 0.5rem;
+  color: var(--preop-text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: var(--preop-primary);
+  background: #111827;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: #6b7280;
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.6;
+}
+
+.form-field select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 3rem;
+}
+
+/* ==================== MENSAJES ==================== */
+.form-message {
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-message.success {
+  background: rgba(34, 197, 94, 0.15);
+  color: #86efac;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.form-message.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ==================== BOTONES ==================== */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--preop-border);
+}
+
+.cancel-btn,
+.submit-btn {
+  flex: 1;
+  max-width: 180px;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.cancel-btn {
+  background: var(--preop-input-bg);
+  color: var(--preop-text-soft);
+  border: 1px solid var(--preop-border);
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: var(--preop-border);
+  color: var(--preop-text);
+  border-color: #4b5563;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, var(--preop-primary) 0%, #2563eb 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+.submit-btn:disabled,
+.cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==================== LOADING ==================== */
+.preop-loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--preop-text-soft);
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--preop-border);
+  border-top-color: var(--preop-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.preop-loading p {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .preop-container {
+    padding: 1.25rem;
+  }
+
+  .preop-form-container {
+    padding: 1.5rem;
+  }
+
+  .preop-header h1,
+  .preop-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .form-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .change-vehicle-btn {
+    width: 100%;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-btn,
+  .submit-btn {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .form-info {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .vehicle-buttons {
+    flex-direction: column;
+  }
+
+  .vehicle-btn {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .preop-header h1,
+  .preop-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .vehicle-btn {
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .form-field input,
+  .form-field textarea,
+  .form-field select {
+    font-size: 0.875rem;
+  }
+}

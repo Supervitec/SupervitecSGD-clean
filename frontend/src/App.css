@@ -1,0 +1,6 @@
+/* Contenedor raíz de la SPA */
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
