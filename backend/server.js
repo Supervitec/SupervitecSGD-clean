@@ -97,7 +97,7 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-// ========== MANEJO DE ERRORES ==========
+// ========== MANEJO DE ERRORES ========== 
 
 app.use((err, req, res, next) => {
   console.error('Error del servidor:', err);
