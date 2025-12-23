@@ -52,19 +52,21 @@ app.use(cookieParser());
 
 app.set('trust proxy', 1);
 
+app.use(attachUser);const isProd = process.env.NODE_ENV === 'production';
+
 app.use(session({
   secret: process.env.SESSION_SECRET || '5up3r_v1t3c',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true,        // obligatorio en producción con HTTPS
     httpOnly: true,
-    sameSite: 'none',    // permite enviar cookie entre dominios
-    maxAge: 24 * 60 * 60 * 1000
-  },
+    maxAge: 24 * 60 * 60 * 1000,
+    secure: isProd,          // true en Render (https)
+    sameSite: isProd ? 'none' : 'lax'
+  }
 })); 
 
-app.use(attachUser);
+
 
 // ========== RUTAS ==========
 
