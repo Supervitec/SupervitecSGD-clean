@@ -1,5 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://supervitec-sgd-clean.vercel.app'
+];
+  
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
@@ -30,7 +36,13 @@ mongoose.connect(MONGODB_URI)
 
 // ========== MIDDLEWARES ==========
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 
