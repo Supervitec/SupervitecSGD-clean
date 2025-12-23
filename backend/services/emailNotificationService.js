@@ -89,7 +89,7 @@ class EmailNotificationService {
           </div>
           
           <div style="margin-top: 30px; text-align: center;">
-            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard" 
+            <a href="${process.env.FRONTEND_URL || 'https://supervitec-sgd-clean.vercel.app/'}/dashboard" 
                style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
                       color: white; 
                       padding: 12px 30px; 
@@ -192,7 +192,7 @@ async sendCitationEmail(tokens, userName, userId, sanctionHistory, userEmail = n
         </div>
 
         <div style="text-align: center; margin-top: 30px;">
-          <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard" 
+          <a href="${process.env.FRONTEND_URL || 'https://supervitec-sgd-clean.vercel.app/'}/dashboard" 
              style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
                     color: white; 
                     padding: 15px 40px; 
@@ -291,7 +291,7 @@ async sendCitationEmail(tokens, userName, userId, sanctionHistory, userEmail = n
           </div>
           
           <div style="margin-top: 30px; text-align: center;">
-            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard" 
+            <a href="${process.env.FRONTEND_URL || 'https://supervitec-sgd-clean.vercel.app/'}/dashboard" 
                style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
                       color: white; 
                       padding: 12px 30px; 

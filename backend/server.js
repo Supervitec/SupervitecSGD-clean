@@ -112,7 +112,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`\n${'='.repeat(50)}`);
   console.log(` Servidor Supervitec Dashboard iniciado`);
-  console.log(` URL: http://localhost:${PORT}`);
+  console.log(` URL: https://supervitecsgd.onrender.com${PORT}`);
   console.log(` OAuth Callback: ${process.env.REDIRECT_URI}`);
   console.log(` Frontend: ${process.env.FRONTEND_URL}`);
   console.log(`${'='.repeat(50)}\n`);

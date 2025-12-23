@@ -65,7 +65,7 @@ start(adminTokens) {
    */
   async getUsersForToday() {
     try {
-      const response = await fetch('http://localhost:3000/api/users-preop');
+      const response = await fetch('https://supervitec-sgd-clean.vercel.app/api/users-preop');
       const data = await response.json();
       
       if (!data.users || data.users.length === 0) {

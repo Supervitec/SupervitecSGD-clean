@@ -15,7 +15,7 @@ export default function Login() {
   }, [location, navigate]);
 
   const handleLogin = () => {
-    window.location.href = 'http://localhost:3000/api/auth/google'; 
+    window.location.href = 'https://supervitecsgd.onrender.com/api/auth/google'; 
   };
 
   return (
