@@ -45,6 +45,7 @@ exports.googleCallback = async (req, res) => {
     const userInfo = await getUserInfo(tokens);
     console.log('👤 Info de usuario obtenida:', userInfo.email);
 
+    // Guardar datos en la sesión
     req.session.tokens = tokens;
     req.session.user = userInfo;
     req.session.isAuthenticated = true;

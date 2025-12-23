@@ -5,7 +5,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'https://supervitec-sgd-clean.vercel.app'
 ];
-  
+
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
@@ -35,6 +35,7 @@ mongoose.connect(MONGODB_URI)
   });
 
 // ========== MIDDLEWARES ==========
+
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
@@ -46,13 +47,14 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json({limit: '150mb'}));
+app.use(express.json({ limit: '150mb' }));
 app.use(express.urlencoded({ limit: '150mb', extended: true }));
 app.use(cookieParser());
 
+// Muy importante detrás de Render/Onrender
 app.set('trust proxy', 1);
 
-app.use(attachUser);const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === 'production';
 
 app.use(session({
   secret: process.env.SESSION_SECRET || '5up3r_v1t3c',
@@ -61,12 +63,13 @@ app.use(session({
   cookie: {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
-    secure: isProd,          // true en Render (https)
+    secure: isProd,                 // true en producción con HTTPS [web:20][web:24]
     sameSite: isProd ? 'none' : 'lax'
   }
-})); 
+}));
 
-
+// attachUser SIEMPRE después de session
+app.use(attachUser);
 
 // ========== RUTAS ==========
 
@@ -79,23 +82,26 @@ app.use('/api/users-preop', require('./routes/preopUsers'));
 app.use('/api/preop', require('./routes/preoperational'));
 app.use('/api/debug', require('./routes/debug'));
 app.use('/api/review', require('./routes/review'));
-app.use('/api/calendar', calendarRoutes); 
+app.use('/api/calendar', calendarRoutes);
 app.use('/api/citations', citationRoutes);
 
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     message: 'Backend Supervitec funcionando',
     timestamp: new Date().toISOString()
   });
 });
 
-app.get('/api/protected', require('./middleware/authMiddleware').requireAuth, (req, res) => {
-  res.json({
-    message: '¡Ruta protegida! Solo usuarios autenticados pueden ver esto',
-    user: req.user
-  });
-});
+app.get('/api/protected',
+  require('./middleware/authMiddleware').requireAuth,
+  (req, res) => {
+    res.json({
+      message: '¡Ruta protegida! Solo usuarios autenticados pueden ver esto',
+      user: req.user
+    });
+  }
+);
 
 // ========== SCHEDULER DE PREOPERACIONALES ==========
 
