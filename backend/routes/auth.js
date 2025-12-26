@@ -6,7 +6,6 @@ const authController = require('../controllers/authController');
 const { requireAuth } = require('../middleware/authMiddleware');
 const tokenManager = require('../services/tokenManager');
 
-// ========== IMPORTAR OAUTH2CLIENT DESDE CONFIG ==========
 const { oauth2Client } = require('../config/google-auth');
 
 router.get('/google', authController.initiateGoogleAuth);
@@ -67,15 +66,20 @@ router.get('/google/callback', async (req, res) => {
           userId: data.id
         },
         process.env.SESSION_SECRET || '5up3r_v1t3c',
-        { expiresIn: '5m' } // Token válido solo 5 minutos
+        { expiresIn: '5m' }
       );
       
       console.log('✅ Sesión guardada. Generando token temporal...');
       console.log('Session ID:', req.sessionID);
       console.log('🔑 Token JWT generado');
+      console.log('📏 Longitud del token:', authToken.length); // NUEVO LOG
       
-      // Redirigir con token en URL
-      res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${authToken}`);
+      // ========== ENCODEAR TOKEN PARA URL ==========
+      const encodedToken = encodeURIComponent(authToken);
+      console.log('🔐 Token encodeado para URL');
+      
+      // Redirigir con token encodeado
+      res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${encodedToken}`);
     });
     
   } catch (error) {

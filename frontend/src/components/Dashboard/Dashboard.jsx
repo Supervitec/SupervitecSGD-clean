@@ -172,45 +172,50 @@ export default function Dashboard() {
   };
 
   // ===== User con TOKEN JWT =====
-  useEffect(() => {
-    const loadUserInfo = async () => {
-      try {
-        // ========== CAPTURAR TOKEN DE URL ==========
-        const params = new URLSearchParams(window.location.search);
-        const token = params.get('token');
-        
-        console.log('🔍 Verificando autenticación...');
-        if (token) {
-          console.log('🔑 Token JWT detectado en URL');
-        }
-
-        // Hacer petición con token si existe
-        const config = token 
-          ? { headers: { 'Authorization': `Bearer ${token}` } }
-          : {};
-        
-        const response = await api.get('/auth/me', config);
-        console.log('✅ Usuario autenticado:', response.data.user.email);
-        setUser(response.data.user);
-        
-        // ========== LIMPIAR TOKEN DE URL ==========
-        if (token) {
-          console.log('🧹 Limpiando token de URL');
-          window.history.replaceState({}, document.title, '/dashboard');
-        }
-      } catch (err) {
-        console.error('❌ Error cargando usuario:', err);
-        setError('No se pudo cargar la información del usuario');
-        if (err.response?.status === 401) {
-          console.warn('⚠️ Sesión no válida, redirigiendo a login');
-          window.location.href = '/?session=expired';
-        }
-      } finally {
-        setLoading(false);
+useEffect(() => {
+  const loadUserInfo = async () => {
+    try {
+      // ========== CAPTURAR Y DECODIFICAR TOKEN DE URL ==========
+      const params = new URLSearchParams(window.location.search);
+      const encodedToken = params.get('token');
+      
+      // DECODIFICAR el token
+      const token = encodedToken ? decodeURIComponent(encodedToken) : null;
+      
+      console.log('🔍 Verificando autenticación...');
+      if (token) {
+        console.log('🔑 Token JWT detectado en URL');
+        console.log('📏 Longitud del token:', token.length);
+        console.log('🔍 Inicio del token:', token.substring(0, 50) + '...');
       }
-    };
-    loadUserInfo();
-  }, []);
+
+      // Hacer petición con token si existe
+      const config = token 
+        ? { headers: { 'Authorization': `Bearer ${token}` } }
+        : {};
+      
+      const response = await api.get('/auth/me', config);
+      console.log('✅ Usuario autenticado:', response.data.user.email);
+      setUser(response.data.user);
+      
+      // ========== LIMPIAR TOKEN DE URL ==========
+      if (token) {
+        console.log('🧹 Limpiando token de URL');
+        window.history.replaceState({}, document.title, '/dashboard');
+      }
+    } catch (err) {
+      console.error('❌ Error cargando usuario:', err);
+      setError('No se pudo cargar la información del usuario');
+      if (err.response?.status === 401) {
+        console.warn('⚠️ Sesión no válida, redirigiendo a login');
+        window.location.href = '/?session=expired';
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  loadUserInfo();
+}, []);
 
   // ===== Efectos de filtros =====
   useEffect(() => {
