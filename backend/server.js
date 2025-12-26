@@ -28,6 +28,15 @@ mongoose.connect(MONGODB_URI)
     process.exit(1);
   });
 
+// ========== CONFIGURACIÓN CRÍTICA ==========
+
+// IMPORTANTE: Confiar en el proxy de Render ANTES de todo
+app.set('trust proxy', 1);
+
+const isProd = process.env.NODE_ENV === 'production';
+
+console.log(`🌍 Entorno: ${isProd ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
+
 // ========== MIDDLEWARES ==========
 
 const allowedOrigins = [
@@ -35,6 +44,7 @@ const allowedOrigins = [
   'https://supervitec-sgd-clean.vercel.app'
 ];
 
+// CORS ANTES de session
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
@@ -45,36 +55,36 @@ app.use(cors({
     
     return callback(new Error('Not allowed by CORS'));
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Parsers
 app.use(express.json({ limit: '150mb' }));
 app.use(express.urlencoded({ limit: '150mb', extended: true }));
 app.use(cookieParser());
 
-// Confiar en el proxy de Render
-app.set('trust proxy', 1);
+// ========== SESIÓN ==========
 
-// Determinar si estamos en producción
-const isProd = process.env.NODE_ENV === 'production';
-
-console.log(`🌍 Entorno: ${isProd ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
-console.log(`🍪 Cookies secure: ${isProd}`);
-console.log(`🔒 SameSite: ${isProd ? 'none' : 'lax'}`);
-
-// Configuración de sesión (MemoryStore por defecto)
 app.use(session({
   secret: process.env.SESSION_SECRET || '5up3r_v1t3c',
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    secure: isProd,
-    sameSite: isProd ? 'none' : 'lax'
+    maxAge: 24 * 60 * 60 * 1000, // 24 horas
+    secure: isProd,  // true en producción
+    sameSite: isProd ? 'none' : 'lax',
+    path: '/',
+    domain: undefined  // NO especificar dominio para cross-site
   },
-  name: 'connect.sid'
+  name: 'connect.sid',
+  proxy: true  // ← CRÍTICO: habilita x-forwarded-proto
 }));
+
+console.log(`🍪 Cookies secure: ${isProd}`);
+console.log(`🔒 SameSite: ${isProd ? 'none' : 'lax'}`);
 
 // attachUser SIEMPRE después de session
 app.use(attachUser);
@@ -112,7 +122,7 @@ app.get('/api/protected',
   }
 );
 
-// ========== SCHEDULER DE PREOPERACIONALES ==========
+// ========== SCHEDULER ==========
 
 preoperationalScheduler.start(null);
 
