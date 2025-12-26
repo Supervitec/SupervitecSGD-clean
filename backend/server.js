@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
-const MongoStore = require('connect-mongo'); // ← Asegúrate de tenerlo instalado
+const MongoStore = require('connect-mongo');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -16,27 +16,17 @@ const preoperationalScheduler = require('./services/preoperationalScheduler');
 const citationRoutes = require('./routes/citation');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// ========== CONEXIÓN A MONGODB ==========
-
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/supervitec-sgd';
-
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('✅ Conectado a MongoDB'))
-  .catch((error) => {
-    console.error('❌ Error conectando a MongoDB:', error);
-    process.exit(1);
-  });
+const PORT = process.env.PORT || 10000; // ← Render usa 10000 por defecto
 
 // ========== CONFIGURACIÓN CRÍTICA ==========
 
-// IMPORTANTE: Confiar en el proxy de Render ANTES de todo
-app.set('trust proxy', 1);
-
 const isProd = process.env.NODE_ENV === 'production';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/supervitec-sgd';
 
 console.log(`🌍 Entorno: ${isProd ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
+
+// IMPORTANTE: Confiar en el proxy de Render ANTES de todo
+app.set('trust proxy', 1);
 
 // ========== MIDDLEWARES ==========
 
@@ -45,10 +35,8 @@ const allowedOrigins = [
   'https://supervitec-sgd-clean.vercel.app'
 ];
 
-// CORS ANTES de session
 app.use(cors({
   origin: function (origin, callback) {
-    // Permitir requests sin origin (Postman, mobile apps, etc)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.includes(origin)) {
@@ -61,39 +49,35 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['set-cookie'] // ← AÑADIR ESTO
+  exposedHeaders: ['set-cookie']
 }));
 
-// Parsers
 app.use(express.json({ limit: '150mb' }));
 app.use(express.urlencoded({ limit: '150mb', extended: true }));
 app.use(cookieParser());
 
 // ========== SESIÓN CON MONGOSTORE ==========
 
-const sessionStore = new MongoStore({
-  mongoUrl: MONGODB_URI,
-  touchAfter: 24 * 3600,
-  crypto: {
-    secret: process.env.SESSION_SECRET || '5up3r_v1t3c'
-  }
-});
-
 app.use(session({
   secret: process.env.SESSION_SECRET || '5up3r_v1t3c',
   resave: false,
   saveUninitialized: false,
-  store: sessionStore, 
+  store: MongoStore.create({  // ← Usa .create() para connect-mongo v5+
+    mongoUrl: MONGODB_URI,
+    touchAfter: 24 * 3600,
+    crypto: {
+      secret: process.env.SESSION_SECRET || '5up3r_v1t3c'
+    }
+  }),
   cookie: {
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 horas
-    secure: isProd,  // true en producción
-    sameSite: isProd ? 'none' : 'lax', // 'none' para cross-site en prod
+    maxAge: 24 * 60 * 60 * 1000,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
     path: '/'
-    // NO poner domain para permitir cross-domain
   },
   name: 'connect.sid',
-  proxy: true  // ← CRÍTICO: habilita x-forwarded-proto
+  proxy: true
 }));
 
 console.log(`🍪 Cookies secure: ${isProd}`);
@@ -122,7 +106,7 @@ app.get('/api/health', (req, res) => {
     message: 'Backend Supervitec funcionando',
     timestamp: new Date().toISOString(),
     environment: isProd ? 'production' : 'development',
-    session: req.session ? 'active' : 'none' // ← Debug
+    session: req.session ? 'active' : 'none'
   });
 });
 
@@ -136,22 +120,6 @@ app.get('/api/protected',
   }
 );
 
-// ========== SCHEDULER ==========
-
-preoperationalScheduler.start(null);
-
-process.on('SIGTERM', () => {
-  console.log('SIGTERM recibido, cerrando scheduler...');
-  preoperationalScheduler.stop();
-  process.exit(0);
-});
-
-process.on('SIGINT', () => {
-  console.log('SIGINT recibido, cerrando scheduler...');
-  preoperationalScheduler.stop();
-  process.exit(0);
-});
-
 // ========== MANEJO DE ERRORES ==========
 
 app.use((err, req, res, next) => {
@@ -162,14 +130,41 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ========== INICIAR SERVIDOR ==========
+// ========== CONEXIÓN A MONGODB E INICIO DEL SERVIDOR ==========
 
-app.listen(PORT, () => {
-  console.log(`\n${'='.repeat(50)}`);
-  console.log(`🚀 Servidor Supervitec Dashboard iniciado`);
-  console.log(`🌐 URL: https://supervitecsgd.onrender.com`);
-  console.log(`🔐 OAuth Callback: ${process.env.REDIRECT_URI}`);
-  console.log(`💻 Frontend: ${process.env.FRONTEND_URL}`);
-  console.log(`📦 Entorno: ${isProd ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
-  console.log(`${'='.repeat(50)}\n`);
+mongoose.connect(MONGODB_URI)
+  .then(() => {
+    console.log('✅ Conectado a MongoDB');
+    
+    // Iniciar scheduler DESPUÉS de conectar a DB
+    preoperationalScheduler.start(null);
+    
+    // Iniciar servidor
+    app.listen(PORT, '0.0.0.0', () => {  // ← IMPORTANTE: bind a 0.0.0.0
+      console.log(`\n${'='.repeat(50)}`);
+      console.log(`🚀 Servidor Supervitec Dashboard iniciado`);
+      console.log(`🌐 URL: https://supervitecsgd.onrender.com`);
+      console.log(`🔐 OAuth Callback: ${process.env.REDIRECT_URI}`);
+      console.log(`💻 Frontend: ${process.env.FRONTEND_URL}`);
+      console.log(`📦 Entorno: ${isProd ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
+      console.log(`${'='.repeat(50)}\n`);
+    });
+  })
+  .catch((error) => {
+    console.error('❌ Error conectando a MongoDB:', error);
+    process.exit(1);
+  });
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM recibido, cerrando scheduler...');
+  preoperationalScheduler.stop();
+  mongoose.connection.close();
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT recibido, cerrando scheduler...');
+  preoperationalScheduler.stop();
+  mongoose.connection.close();
+  process.exit(0);
 });
