@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
+const MongoStore = require('connect-mongo'); // ← Asegúrate de tenerlo instalado
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -47,17 +48,20 @@ const allowedOrigins = [
 // CORS ANTES de session
 app.use(cors({
   origin: function (origin, callback) {
+    // Permitir requests sin origin (Postman, mobile apps, etc)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     
+    console.warn(`⚠️ Origen no permitido: ${origin}`);
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['set-cookie'] // ← AÑADIR ESTO
 }));
 
 // Parsers
@@ -65,19 +69,28 @@ app.use(express.json({ limit: '150mb' }));
 app.use(express.urlencoded({ limit: '150mb', extended: true }));
 app.use(cookieParser());
 
-// ========== SESIÓN ==========
+// ========== SESIÓN CON MONGOSTORE ==========
+
+const sessionStore = MongoStore.create({
+  mongoUrl: MONGODB_URI,
+  touchAfter: 24 * 3600, // lazy session update (segundos)
+  crypto: {
+    secret: process.env.SESSION_SECRET || '5up3r_v1t3c'
+  }
+});
 
 app.use(session({
   secret: process.env.SESSION_SECRET || '5up3r_v1t3c',
   resave: false,
   saveUninitialized: false,
+  store: sessionStore, // ← IMPORTANTE: persistir sesiones en MongoDB
   cookie: {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 horas
     secure: isProd,  // true en producción
-    sameSite: isProd ? 'none' : 'lax',
-    path: '/',
-    domain: undefined  // NO especificar dominio para cross-site
+    sameSite: isProd ? 'none' : 'lax', // 'none' para cross-site en prod
+    path: '/'
+    // NO poner domain para permitir cross-domain
   },
   name: 'connect.sid',
   proxy: true  // ← CRÍTICO: habilita x-forwarded-proto
@@ -108,7 +121,8 @@ app.get('/api/health', (req, res) => {
     status: 'OK',
     message: 'Backend Supervitec funcionando',
     timestamp: new Date().toISOString(),
-    environment: isProd ? 'production' : 'development'
+    environment: isProd ? 'production' : 'development',
+    session: req.session ? 'active' : 'none' // ← Debug
   });
 });
 
