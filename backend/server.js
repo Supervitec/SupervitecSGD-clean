@@ -1,14 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://supervitec-sgd-clean.vercel.app'
-];
-
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const MongoStore = require('connect-mongo');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -28,20 +23,28 @@ const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/supervitec-sgd';
 
 mongoose.connect(MONGODB_URI)
-  .then(() => console.log(' Conectado a MongoDB'))
+  .then(() => console.log('✅ Conectado a MongoDB'))
   .catch((error) => {
-    console.error(' Error conectando a MongoDB:', error);
+    console.error('❌ Error conectando a MongoDB:', error);
     process.exit(1);
   });
 
 // ========== MIDDLEWARES ==========
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://supervitec-sgd-clean.vercel.app'
+];
+
 app.use(cors({
   origin: function (origin, callback) {
+    // Permite requests sin origin (Postman, curl, etc.)
     if (!origin) return callback(null, true);
+    
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
+    
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
@@ -51,26 +54,36 @@ app.use(express.json({ limit: '150mb' }));
 app.use(express.urlencoded({ limit: '150mb', extended: true }));
 app.use(cookieParser());
 
-// Muy importante detrás de Render/Onrender
+// Confiar en el proxy de Render (obligatorio para secure cookies)
 app.set('trust proxy', 1);
 
-const MongoStore = require('connect-mongo');
+// Determinar si estamos en producción
 const isProd = process.env.NODE_ENV === 'production';
 
+console.log(`🌍 Entorno: ${isProd ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
+console.log(`🍪 Cookies secure: ${isProd}`);
+console.log(`🔒 SameSite: ${isProd ? 'none' : 'lax'}`);
+
+// Configuración de sesión con MongoDB store
 app.use(session({
   secret: process.env.SESSION_SECRET || '5up3r_v1t3c',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: MONGODB_URI,
-    touchAfter: 24 * 3600
+    touchAfter: 24 * 3600, // actualiza sesión cada 24h
+    crypto: {
+      secret: process.env.SESSION_SECRET || '5up3r_v1t3c'
+    }
   }),
   cookie: {
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    secure: isProd,
-    sameSite: isProd ? 'none' : 'lax'
-  }
+    maxAge: 24 * 60 * 60 * 1000, // 24 horas
+    secure: isProd,              // true en producción (HTTPS)
+    sameSite: isProd ? 'none' : 'lax',  // 'none' para cross-site en producción
+    domain: isProd ? '.onrender.com' : undefined  // dominio raíz para Render
+  },
+  name: 'connect.sid' // nombre explícito de la cookie
 }));
 
 // attachUser SIEMPRE después de session
@@ -94,7 +107,8 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
     message: 'Backend Supervitec funcionando',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    environment: isProd ? 'production' : 'development'
   });
 });
 
@@ -124,13 +138,13 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-// ========== MANEJO DE ERRORES ========== 
+// ========== MANEJO DE ERRORES ==========
 
 app.use((err, req, res, next) => {
-  console.error('Error del servidor:', err);
+  console.error('❌ Error del servidor:', err);
   res.status(500).json({
     error: 'Error interno del servidor',
-    message: err.message
+    message: isProd ? 'Error interno del servidor' : err.message
   });
 });
 
@@ -138,9 +152,10 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`\n${'='.repeat(50)}`);
-  console.log(` Servidor Supervitec Dashboard iniciado`);
-  console.log(` URL: https://supervitecsgd.onrender.com`);
-  console.log(` OAuth Callback: ${process.env.REDIRECT_URI}`);
-  console.log(` Frontend: ${process.env.FRONTEND_URL}`);
+  console.log(`🚀 Servidor Supervitec Dashboard iniciado`);
+  console.log(`🌐 URL: https://supervitecsgd.onrender.com`);
+  console.log(`🔐 OAuth Callback: ${process.env.REDIRECT_URI}`);
+  console.log(`💻 Frontend: ${process.env.FRONTEND_URL}`);
+  console.log(`📦 Entorno: ${isProd ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
   console.log(`${'='.repeat(50)}\n`);
 });
