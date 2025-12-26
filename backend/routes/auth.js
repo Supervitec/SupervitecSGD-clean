@@ -1,10 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const { google } = require('googleapis');
 const authController = require('../controllers/authController');
 const { requireAuth } = require('../middleware/authMiddleware');
+const tokenManager = require('../services/tokenManager');
+
+// ========== IMPORTAR OAUTH2CLIENT DESDE CONFIG ==========
+const { oauth2Client } = require('../config/google-auth');
 
 router.get('/google', authController.initiateGoogleAuth);
-
 
 router.get('/google/callback', async (req, res) => {
   try {
@@ -17,7 +21,8 @@ router.get('/google/callback', async (req, res) => {
       return res.redirect(`${process.env.FRONTEND_URL}?error=no_code`);
     }
 
-    // Intercambiar código por tokens...
+    console.log('✅ Código recibido, intercambiando por tokens...');
+
     const { tokens } = await oauth2Client.getToken(code);
     
     console.log('✅ Tokens obtenidos');
@@ -29,12 +34,20 @@ router.get('/google/callback', async (req, res) => {
     
     console.log(`👤 Info de usuario obtenida: ${data.email}`);
     
+    // Guardar tokens en tokenManager (para admin)
+    tokenManager.setAdminTokens(tokens);
+    console.log('✅ Tokens de admin guardados en tokenManager');
+    
     // Guardar en sesión
     req.session.userId = data.id;
     req.session.userEmail = data.email;
+    req.session.userName = data.name;
     req.session.tokens = tokens;
+    req.session.isAdmin = true;
     
-    // ========== Guardar sesión ANTES de redirect ==========
+    console.log('✅ Usuario ADMIN autenticado');
+    
+    // ========== CRÍTICO: Guardar sesión ANTES de redirect ==========
     req.session.save((err) => {
       if (err) {
         console.error('❌ Error guardando sesión:', err);
@@ -49,13 +62,11 @@ router.get('/google/callback', async (req, res) => {
     
   } catch (error) {
     console.error('❌ Error en callback:', error);
-    res.redirect(`${process.env.FRONTEND_URL}?error=auth_failed`);
+    res.redirect(`${process.env.FRONTEND_URL}?error=auth_failed&message=${encodeURIComponent(error.message)}`);
   }
 });
 
-
 router.get('/me', requireAuth, authController.getCurrentUser);
-
 
 router.post('/logout', authController.logout);
 
