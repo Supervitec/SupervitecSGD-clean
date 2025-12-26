@@ -13,31 +13,31 @@ class PreoperationalScheduler {
  * Iniciar todos los cron jobs
  */
 start(adminTokens) {
-  console.log(' Iniciando scheduler de preoperacionales...');
+  console.log('📅 Iniciando scheduler de preoperacionales...');
 
   const job9AM = cron.schedule('0 9 * * *', async () => {
-    console.log(' [9:00 AM] Verificando preoperacionales no entregados...');
+    console.log('🔍 [9:00 AM] Verificando preoperacionales no entregados...');
     await this.checkMissedPreoperacionals(adminTokens);
   }, {
     timezone: 'America/Bogota'
   });
 
   const job12PM = cron.schedule('0 12 * * *', async () => {
-  console.log('⏰ [CRON] Ejecutando verificación automática...');
-  await runManualCheck(null);
-}, {
-  timezone: 'America/Bogota'
-});
+    console.log('⏰ [12:00 PM] Aplicando sanciones automáticas...');
+    await this.applySanctions(adminTokens); // ✅ CORREGIDO: usa this.applySanctions
+  }, {
+    timezone: 'America/Bogota'
+  });
 
   const job7PM = cron.schedule('0 19 * * *', async () => {
-    console.log(' [7:00 PM] Generando reporte diario...');
+    console.log('📊 [7:00 PM] Generando reporte diario...');
     await this.generateDailyReport(adminTokens);
   }, {
     timezone: 'America/Bogota'
   });
 
   const job745AM = cron.schedule('45 7 * * *', async () => {
-    console.log(' [7:45 AM] Enviando recordatorio de preoperacional...');
+    console.log('📢 [7:45 AM] Enviando recordatorio de preoperacional...');
     await this.sendMorningReminder(adminTokens);
   }, {
     timezone: 'America/Bogota'
@@ -45,7 +45,7 @@ start(adminTokens) {
 
   this.jobs.push(job9AM, job12PM, job7PM, job745AM);
 
-  console.log(' Scheduler iniciado correctamente');
+  console.log('✅ Scheduler iniciado correctamente');
   console.log('   - 7:45 AM: Recordatorio para llenar preoperacional');
   console.log('   - 9:00 AM: Verificación de preoperacionales');
   console.log('   - 12:00 PM: Aplicación de sanciones');
