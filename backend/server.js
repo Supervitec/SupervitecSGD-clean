@@ -3,7 +3,6 @@ const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
-const MongoStore = require('connect-mongo');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -38,7 +37,6 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Permite requests sin origin (Postman, curl, etc.)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.includes(origin)) {
@@ -54,7 +52,7 @@ app.use(express.json({ limit: '150mb' }));
 app.use(express.urlencoded({ limit: '150mb', extended: true }));
 app.use(cookieParser());
 
-// Confiar en el proxy de Render (obligatorio para secure cookies)
+// Confiar en el proxy de Render
 app.set('trust proxy', 1);
 
 // Determinar si estamos en producción
@@ -64,26 +62,18 @@ console.log(`🌍 Entorno: ${isProd ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
 console.log(`🍪 Cookies secure: ${isProd}`);
 console.log(`🔒 SameSite: ${isProd ? 'none' : 'lax'}`);
 
-// Configuración de sesión con MongoDB store
+// Configuración de sesión (MemoryStore por defecto)
 app.use(session({
   secret: process.env.SESSION_SECRET || '5up3r_v1t3c',
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: MONGODB_URI,
-    touchAfter: 24 * 3600, // actualiza sesión cada 24h
-    crypto: {
-      secret: process.env.SESSION_SECRET || '5up3r_v1t3c'
-    }
-  }),
   cookie: {
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 horas
-    secure: isProd,              // true en producción (HTTPS)
-    sameSite: isProd ? 'none' : 'lax',  // 'none' para cross-site en producción
-    domain: isProd ? '.onrender.com' : undefined  // dominio raíz para Render
+    maxAge: 24 * 60 * 60 * 1000,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax'
   },
-  name: 'connect.sid' // nombre explícito de la cookie
+  name: 'connect.sid'
 }));
 
 // attachUser SIEMPRE después de session
