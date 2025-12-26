@@ -71,9 +71,9 @@ app.use(cookieParser());
 
 // ========== SESIÓN CON MONGOSTORE ==========
 
-const sessionStore = MongoStore.create({
+const sessionStore = new MongoStore({
   mongoUrl: MONGODB_URI,
-  touchAfter: 24 * 3600, // lazy session update (segundos)
+  touchAfter: 24 * 3600,
   crypto: {
     secret: process.env.SESSION_SECRET || '5up3r_v1t3c'
   }
@@ -83,7 +83,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || '5up3r_v1t3c',
   resave: false,
   saveUninitialized: false,
-  store: sessionStore, // ← IMPORTANTE: persistir sesiones en MongoDB
+  store: sessionStore, 
   cookie: {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 horas
