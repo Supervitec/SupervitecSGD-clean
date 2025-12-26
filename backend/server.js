@@ -54,16 +54,21 @@ app.use(cookieParser());
 // Muy importante detrás de Render/Onrender
 app.set('trust proxy', 1);
 
+const MongoStore = require('connect-mongo');
 const isProd = process.env.NODE_ENV === 'production';
 
 app.use(session({
   secret: process.env.SESSION_SECRET || '5up3r_v1t3c',
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: MONGODB_URI,
+    touchAfter: 24 * 3600
+  }),
   cookie: {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
-    secure: isProd,                 // true en producción con HTTPS [web:20][web:24]
+    secure: isProd,
     sameSite: isProd ? 'none' : 'lax'
   }
 }));
@@ -134,7 +139,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`\n${'='.repeat(50)}`);
   console.log(` Servidor Supervitec Dashboard iniciado`);
-  console.log(` URL: https://supervitecsgd.onrender.com${PORT}`);
+  console.log(` URL: https://supervitecsgd.onrender.com`);
   console.log(` OAuth Callback: ${process.env.REDIRECT_URI}`);
   console.log(` Frontend: ${process.env.FRONTEND_URL}`);
   console.log(`${'='.repeat(50)}\n`);
